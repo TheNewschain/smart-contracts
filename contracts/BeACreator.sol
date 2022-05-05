@@ -18,6 +18,9 @@ contract BeACreator is ReentrancyGuard {
     string socialMedia;
     string personalWebsite;
     address walletAddress;
+    string bio;
+    string profilePhoto;
+    string coverPhoto;
   }
 
   mapping(address => bool) public isCreator; // To check if a user already has an account
@@ -28,11 +31,17 @@ contract BeACreator is ReentrancyGuard {
    * @param _email the email id of creator
    *               _socialMedia the social media link of the creator
    *               _personalSite any personal website link
+   *              _bio creator's short bio
+   *              _profilePhoto creator's profile photo
+   *              _coverPhoto creator's cover photo or bussiness logo
    */
   function createProfile(
     string memory _email,
     string memory _socialMedia,
-    string memory _personalSite
+    string memory _personalSite,
+    string memory _bio,
+    string memory _profilePhoto,
+    string memory _coverPhoto
   ) public nonReentrant {
     require(!isCreator[msg.sender], "user already exists");
     uint256 currentId = userId.current();
@@ -41,7 +50,10 @@ contract BeACreator is ReentrancyGuard {
       _email,
       _socialMedia,
       _personalSite,
-      msg.sender
+      msg.sender,
+      _bio,
+      _profilePhoto,
+      _coverPhoto
     );
     isCreator[msg.sender] = true;
     userId.increment();
@@ -61,5 +73,48 @@ contract BeACreator is ReentrancyGuard {
       }
     }
     return profile;
+  }
+
+  /*
+   *@dev to update profile info
+   * @param _email the email id of creator
+   *               _socialMedia the social media link of the creator
+   *               _personalSite any personal website link
+   *              _bio creator's short bio
+   *              _profilePhoto creator's profile photo
+   *              _coverPhoto creator's cover photo or bussiness logo
+   */
+  function updateProfile(
+    string memory _email,
+    string memory _socialMedia,
+    string memory _personalSite,
+    string memory _bio,
+    string memory _profilePhoto,
+    string memory _coverPhoto
+  ) public {
+    require(isCreator[msg.sender], "user already exists");
+    uint256 currentId = userId.current();
+    Profile memory profile;
+    uint256 profileId;
+    for (uint256 i = 0; i < currentId; i++) {
+      if (userIdToProfile[i].walletAddress == msg.sender) {
+        profile = userIdToProfile[i];
+        profileId = i;
+        break;
+      }
+    }
+    require(
+      profile.walletAddress == msg.sender,
+      "This is not your profile You can edit it"
+    );
+    profile.userId = profileId;
+    profile.emailId = _email;
+    profile.socialMedia = _socialMedia;
+    profile.personalWebsite = _personalSite;
+    profile.walletAddress = msg.sender;
+    profile.bio = _bio;
+    profile.profilePhoto = _profilePhoto;
+    profile.coverPhoto = _coverPhoto;
+    userIdToProfile[profileId] = profile;
   }
 }
