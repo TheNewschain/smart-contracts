@@ -14,7 +14,7 @@ describe("NewsPost", function () {
     await newsPost.deployed();
   });
 
-  it("Users should be able to create posts", async function () {
+  xit("Users should be able to create posts", async function () {
     const txn1 = await newsPost.createPost("hello this is an article");
     await txn1.wait();
 
@@ -23,7 +23,7 @@ describe("NewsPost", function () {
     expect(post.content).to.equal("hello this is an article");
   });
 
-  it("Users should be able to edit a post", async () => {
+  xit("Users should be able to edit a post", async () => {
     const txn1 = await newsPost.createPost("hello this is an article");
     await txn1.wait();
     const txn2 = await newsPost.createPost("this is my second article");
